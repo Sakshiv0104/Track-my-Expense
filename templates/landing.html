@@ -15,13 +15,12 @@
     <div class="hero-inner">
         <div class="hero-badge">Personal Finance Tracker</div>
         <h1 class="hero-title">
-            Know where your<br>
-            <em>money goes</em>
+            Clarity for <em>every rupee.</em>
         </h1>
         <p class="hero-subtitle">
-            Log expenses, understand your spending patterns,
-            and take control of your financial life —
-            one transaction at a time.
+            Spendly replaces scattered notes and mental math with one
+            clear view of your spending, so every decision is backed
+            by real numbers, not guesswork.
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
@@ -33,28 +32,43 @@
 <section class="features">
     <div class="features-inner">
         <div class="feature-card">
-            <div class="feature-icon">₹</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/>
+                    <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2H6a2 2 0 0 1-2-2Z"/>
+                    <circle cx="16.5" cy="13.5" r="1.5"/>
+                </svg>
+            </div>
             <h3 class="feature-title">Log expenses instantly</h3>
             <p class="feature-body">Add any expense in seconds. Category, amount, date, description — all in one simple form.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">◎</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12A9 9 0 1 1 12 3v9Z"/>
+                    <path d="M21 12A9 9 0 0 0 12 3"/>
+                </svg>
+            </div>
             <h3 class="feature-title">Understand your patterns</h3>
             <p class="feature-body">See exactly where your money goes with category breakdowns and monthly summaries.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">◷</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2"/>
+                    <path d="M3 10h18"/>
+                    <path d="M8 3v4"/>
+                    <path d="M16 3v4"/>
+                    <path d="M8 14h.01"/>
+                    <path d="M12 14h.01"/>
+                    <path d="M16 14h.01"/>
+                    <path d="M8 17h.01"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+            </div>
             <h3 class="feature-title">Filter by time period</h3>
             <p class="feature-body">View your spending for any date range — last week, last month, or a custom period.</p>
         </div>
-    </div>
-</section>
-
-<section class="cta-section">
-    <div class="cta-inner">
-        <h2 class="cta-title">Ready to take control?</h2>
-        <p class="cta-body">Join thousands of people who track their expenses with Spendly.</p>
-        <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
     </div>
 </section>
 

@@ -24,22 +24,93 @@
 }
 
 .hero-inner {
-    max-width: 640px;
+    max-width: 860px;
     margin: 0 auto;
-    padding: 4rem 2rem;
+    padding: 5rem 2rem 4.5rem;
     text-align: center;
 }
 
+.hero-title {
+    font-size: clamp(2.75rem, 6vw, 4.75rem);
+}
+
 .hero-subtitle {
+    font-size: 1.2rem;
+    max-width: 620px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .hero-actions {
     justify-content: center;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.hero-actions .btn-primary,
+.hero-actions .btn-ghost {
+    padding: 1.05rem 2.4rem;
+    font-size: 1.05rem;
+    border-radius: var(--radius-md);
+}
+
+/* ------------------------------------------------------------------ */
+/* Feature cards (landing page override)                               */
+/* ------------------------------------------------------------------ */
+
+.features {
+    padding: 6rem 2rem;
+}
+
+.features-inner {
+    gap: 2.5rem;
+}
+
+.feature-card {
+    padding: 2.75rem 2.25rem;
+    border-radius: var(--radius-lg);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.06);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.75rem;
+}
+
+.feature-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.feature-card:nth-child(1) .feature-icon { background: var(--accent-light); color: var(--accent); }
+.feature-card:nth-child(2) .feature-icon { background: var(--accent-2-light); color: var(--accent-2); }
+.feature-card:nth-child(3) .feature-icon { background: rgba(91, 127, 166, 0.14); color: #5b7fa6; }
+
+.feature-title {
+    font-size: 1.35rem;
+    margin-bottom: 0.85rem;
+}
+
+.feature-body {
+    font-size: 0.98rem;
 }
 
 @media (max-width: 900px) {
-    .hero-inner { padding: 3rem 1.5rem; }
+    .hero-inner { padding: 3.5rem 1.5rem; }
     .hero-banner-img { height: 280px; }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-ghost { width: 100%; text-align: center; }
+    .features { padding: 4rem 1.5rem; }
+    .feature-card { padding: 2.25rem 1.75rem; }
 }
