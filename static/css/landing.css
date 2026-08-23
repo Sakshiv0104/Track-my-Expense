@@ -1,0 +1,42 @@
+/* ------------------------------------------------------------------ */
+/* Hero banner override (landing page only)                            */
+/* ------------------------------------------------------------------ */
+
+.hero {
+    display: block;
+    grid-template-columns: none;
+    padding: 0;
+    max-width: none;
+    gap: 0;
+}
+
+.hero-banner {
+    width: 100%;
+    line-height: 0;
+}
+
+.hero-banner-img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.hero-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-actions {
+    justify-content: center;
+}
+
+@media (max-width: 900px) {
+    .hero-inner { padding: 3rem 1.5rem; }
+}
