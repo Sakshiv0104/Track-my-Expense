@@ -18,7 +18,9 @@
 .hero-banner-img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 420px;
+    object-fit: cover;
+    object-position: center 30%;
 }
 
 .hero-inner {
@@ -39,4 +41,5 @@
 
 @media (max-width: 900px) {
     .hero-inner { padding: 3rem 1.5rem; }
+    .hero-banner-img { height: 280px; }
 }
