@@ -16,7 +16,6 @@
             <p class="profile-email">{{ user['email'] }}</p>
             <span class="profile-badge">Member since {{ member_since }}</span>
         </div>
-        <a href="{{ url_for('add_expense') }}" class="btn-primary">+ Add expense</a>
     </div>
 
     {% set empty_message = "No expenses in this range." if filter_active else "No expenses yet." %}
@@ -26,19 +25,23 @@
         <div class="auth-error">{{ filter_error }}</div>
         {% endif %}
 
-        <form method="GET" action="{{ url_for('profile') }}" class="date-filter-form">
-            <div class="form-group">
-                <label for="start_date">From</label>
-                <input type="date" id="start_date" name="start_date"
-                       class="form-input" value="{{ start_date_value }}">
-            </div>
-            <div class="form-group">
-                <label for="end_date">To</label>
-                <input type="date" id="end_date" name="end_date"
-                       class="form-input" value="{{ end_date_value }}">
-            </div>
-            <button type="submit" class="btn-primary">Apply</button>
-        </form>
+        <div class="profile-toolbar">
+            <form method="GET" action="{{ url_for('profile') }}" class="date-filter-form">
+                <div class="form-group">
+                    <label for="start_date">From</label>
+                    <input type="date" id="start_date" name="start_date"
+                           class="form-input" value="{{ start_date_value }}">
+                </div>
+                <div class="form-group">
+                    <label for="end_date">To</label>
+                    <input type="date" id="end_date" name="end_date"
+                           class="form-input" value="{{ end_date_value }}">
+                </div>
+                <button type="submit" class="btn-primary">Apply</button>
+            </form>
+
+            <a href="{{ url_for('add_expense') }}" class="btn-primary btn-add-expense">+ Add expense</a>
+        </div>
 
         {% if filter_active %}
         <div class="filter-status">
@@ -73,7 +76,7 @@
     </div>
 
     <div class="profile-panels">
-        <div class="panel-card">
+        <div class="panel-card panel-main">
             <h2 class="panel-title">Spend by category</h2>
             {% if category_breakdown %}
             <div class="category-chart">
@@ -95,7 +98,7 @@
             {% endif %}
         </div>
 
-        <div class="panel-card">
+        <div class="panel-card panel-side">
             <h2 class="panel-title">Recent expenses</h2>
             {% if recent_expenses %}
             <ul class="recent-list">
