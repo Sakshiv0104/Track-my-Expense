@@ -23,7 +23,9 @@
             by real numbers, not guesswork.
         </p>
         <div class="hero-actions">
+            {% if not session.get('user_id') %}
             <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
+            {% endif %}
             <button type="button" class="btn-ghost" id="how-it-works-btn">See how it works</button>
         </div>
     </div>
