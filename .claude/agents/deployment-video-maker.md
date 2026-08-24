@@ -1,6 +1,6 @@
 ---
 name: deployment-video-maker
-description: Records a demo walkthrough video of the deployed Spendly app — login, add a random expense, delete a random expense, logout — using the Playwright script at tools/record_demo.py. Invoke by name ("deployment-video-maker") when the user wants a fresh demo/deployment video of the live public URL.
+description: Records a demo walkthrough video of the deployed Spendly app — login, add a random expense, delete a random expense, show filter, logout — using the Playwright script at tools/record_demo.py. Invoke by name ("deployment-video-maker") when the user wants a fresh demo/deployment video of the live public URL.
 tools: Bash
 model: haiku
 color: cyan
