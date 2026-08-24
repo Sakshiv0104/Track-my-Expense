@@ -55,17 +55,41 @@
     border-radius: 999px;
 }
 
-.profile-header .btn-primary {
-    margin-left: auto;
-    flex-shrink: 0;
+/* ------------------------------------------------------------------ */
+/* Combined panel (add expense + date filter)                          */
+/* ------------------------------------------------------------------ */
+
+.combined-panel {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* Date range filter                                                   */
-/* ------------------------------------------------------------------ */
+.combined-panel-col {
+    flex: 1;
+    min-width: 0;
+}
 
-.profile-filter {
-    margin-bottom: 2rem;
+.combined-panel-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--border-soft);
+}
+
+.combined-panel-add {
+    display: flex;
+    flex-direction: column;
+}
+
+.combined-add-copy {
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+    margin-bottom: 1.25rem;
+}
+
+.combined-add-btn {
+    align-self: flex-start;
 }
 
 .date-filter-form {
@@ -93,50 +117,56 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
-    max-width: 640px;
 }
 
 .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
     background: var(--paper-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 1.75rem;
+    padding: 2rem;
 }
 
 .stat-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: var(--accent-light);
     color: var(--accent);
-    margin-bottom: 1.1rem;
 }
 
-.stat-icon svg { width: 18px; height: 18px; }
+.stat-icon svg { width: 24px; height: 24px; }
+
+.stat-info {
+    min-width: 0;
+}
 
 .stat-value {
     font-family: var(--font-display);
-    font-size: 1.9rem;
+    font-size: 2.25rem;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
     margin-bottom: 0.25rem;
 }
 
 .stat-label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--ink-muted);
 }
 
 /* ------------------------------------------------------------------ */
-/* Panels (category chart + recent expenses)                           */
+/* Panels (category chart + all expenses)                              */
 /* ------------------------------------------------------------------ */
 
 .profile-panels {
     display: grid;
-    grid-template-columns: 1.3fr 1fr;
+    grid-template-columns: 0.85fr 1.65fr;
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
@@ -162,37 +192,57 @@
     color: var(--ink-muted);
 }
 
-/* Category bar chart — each bar/dot uses the matching --cat-* token (see
-   style.css :root), a validated categorical palette. Color is a secondary
-   channel here, not the only one: every row is still directly labeled with
-   its category name, satisfying the palette's contrast/CVD relief
-   requirement regardless of which categories land next to each other once
-   sorted by amount. */
+/* Spend-by-category pie chart — each slice/dot uses the matching --cat-*
+   token (see style.css :root), a validated categorical palette. Color is a
+   secondary channel here, not the only one: every slice is still directly
+   labeled with its category name in the legend, satisfying the palette's
+   contrast/CVD relief requirement regardless of which categories end up
+   visually adjacent once sorted by amount. */
 
-.category-chart {
+.chart-panel {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-}
-
-.category-row {
-    display: grid;
-    grid-template-columns: minmax(0, 120px) 1fr 80px;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1.5rem;
 }
 
-.category-name {
+.pie-chart-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.pie-chart-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: var(--paper-card);
+    transform: translate(-50%, -50%);
+}
+
+.pie-legend {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pie-legend-item {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
     min-width: 0;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .category-dot {
@@ -202,33 +252,37 @@
     border-radius: 50%;
 }
 
-.category-bar-track {
-    height: 10px;
-    background: var(--border-soft);
-    border-radius: 4px;
+.pie-legend-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.category-bar-fill {
-    height: 100%;
-    border-radius: 0 4px 4px 0;
-}
-
-.category-amount {
+.pie-legend-amount {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--ink-muted);
-    text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
-/* Recent expenses list */
+/* All expenses list */
+
+.expenses-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
 
 .recent-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .recent-row {
@@ -236,13 +290,16 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-soft);
+    padding: 0.9rem 1.1rem;
+    background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.recent-row:last-child {
-    padding-bottom: 0;
-    border-bottom: none;
+.recent-row:hover {
+    background: var(--paper-warm);
+    border-color: var(--border);
 }
 
 .recent-main {
@@ -312,6 +369,8 @@
 
 @media (max-width: 900px) {
     .profile-panels { grid-template-columns: 1fr; }
+    .combined-panel { flex-direction: column; }
+    .combined-panel-divider { width: 100%; height: 1px; }
 }
 
 @media (max-width: 600px) {
@@ -324,8 +383,7 @@
 
     .date-filter-form { flex-direction: column; align-items: stretch; }
 
-    .category-row {
-        grid-template-columns: minmax(0, 90px) 1fr 65px;
-        gap: 0.5rem;
-    }
+    .pie-chart-wrap { width: 150px; height: 150px; }
+
+    .expenses-scroll { max-height: 420px; }
 }

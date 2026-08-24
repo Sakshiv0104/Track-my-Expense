@@ -152,11 +152,16 @@ def test_valid_range_scopes_category_breakdown(client):
     ).get_data(as_text=True)
 
     # Food = 50 + 30 = 80.00, Transport = 20.00 within range
-    assert "Food" in html
-    assert "Transport" in html
-    # Shopping and Entertainment expenses fall outside the range
-    assert "Shopping" not in html
-    assert "Entertainment" not in html
+    assert '<span class="pie-legend-name">Food</span>' in html
+    assert '<span class="pie-legend-name">Transport</span>' in html
+    # Shopping and Entertainment expenses fall outside the range, so they
+    # must not appear in the category breakdown legend — note "Shopping"
+    # itself still appears elsewhere on the page (the always-present
+    # add-expense category dropdown lists all categories regardless of
+    # the active date filter), so the assertion must be scoped to the
+    # legend markup rather than a bare substring check.
+    assert '<span class="pie-legend-name">Shopping</span>' not in html
+    assert '<span class="pie-legend-name">Entertainment</span>' not in html
 
 
 def test_valid_range_scopes_recent_expenses(client):
@@ -419,20 +424,20 @@ def test_get_category_breakdown_with_dates_scopes_result(client):
     assert totals == {"Food": 80.00, "Transport": 20.00}
 
 
-def test_get_recent_expenses_without_dates_matches_alltime(client):
+def test_get_all_expenses_without_dates_matches_alltime(client):
     user_id = _create_user()
     _seed_sample_expenses(user_id)
 
-    rows = db_module.get_recent_expenses(user_id)
+    rows = db_module.get_all_expenses(user_id)
 
     assert len(rows) == 5
 
 
-def test_get_recent_expenses_with_dates_scopes_result(client):
+def test_get_all_expenses_with_dates_scopes_result(client):
     user_id = _create_user()
     _seed_sample_expenses(user_id)
 
-    rows = db_module.get_recent_expenses(
+    rows = db_module.get_all_expenses(
         user_id, start_date="2026-08-01", end_date="2026-08-10"
     )
     descriptions = {row["description"] for row in rows}
@@ -440,18 +445,18 @@ def test_get_recent_expenses_with_dates_scopes_result(client):
     assert descriptions == {"Groceries A", "Bus fare A", "Dinner A"}
 
 
-def test_get_recent_expenses_respects_limit_within_range(client):
+def test_get_all_expenses_returns_full_history_within_range(client):
     user_id = _create_user()
     for day in range(1, 8):
         _insert_expense(
             user_id, 5.00, "Food", f"2026-08-0{day}", f"Item {day}"
         )
 
-    rows = db_module.get_recent_expenses(
-        user_id, limit=3, start_date="2026-08-01", end_date="2026-08-07"
+    rows = db_module.get_all_expenses(
+        user_id, start_date="2026-08-01", end_date="2026-08-07"
     )
 
-    assert len(rows) == 3
+    assert len(rows) == 7
 
 
 def test_date_functions_do_not_filter_across_other_users(client):
