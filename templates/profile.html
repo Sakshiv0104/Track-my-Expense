@@ -16,6 +16,7 @@
             <p class="profile-email">{{ user['email'] }}</p>
             <span class="profile-badge">Member since {{ member_since }}</span>
         </div>
+        <a href="{{ url_for('add_expense') }}" class="btn-primary">+ Add expense</a>
     </div>
 
     {% set empty_message = "No expenses in this range." if filter_active else "No expenses yet." %}
