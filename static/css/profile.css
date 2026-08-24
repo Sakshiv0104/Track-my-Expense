@@ -291,6 +291,17 @@
     font-variant-numeric: tabular-nums;
 }
 
+.recent-edit-link {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.recent-edit-link:hover {
+    color: var(--accent);
+}
+
 /* ------------------------------------------------------------------ */
 /* Responsive                                                          */
 /* ------------------------------------------------------------------ */

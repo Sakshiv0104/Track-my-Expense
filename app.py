@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime
 
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, abort, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import (
@@ -10,12 +10,14 @@ from database.db import (
     create_user,
     get_category_breakdown,
     get_db,
+    get_expense_by_id,
     get_expense_summary,
     get_recent_expenses,
     get_user_by_email,
     get_user_by_id,
     init_db,
     seed_db,
+    update_expense,
 )
 
 app = Flask(__name__)
@@ -290,9 +292,46 @@ def add_expense():
     return redirect(url_for("profile"))
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    expense = get_expense_by_id(id, user_id)
+    if expense is None:
+        abort(404)
+
+    if request.method == "GET":
+        return render_template(
+            "edit_expense.html",
+            expense=expense,
+            categories=ALLOWED_CATEGORIES,
+            amount=expense["amount"],
+            category=expense["category"],
+            date=expense["date"],
+            description=expense["description"] or "",
+        )
+
+    values, error = parse_expense_form(request.form)
+    if error:
+        return render_template(
+            "edit_expense.html",
+            expense=expense,
+            categories=ALLOWED_CATEGORIES,
+            error=error,
+            **values,
+        )
+
+    update_expense(
+        expense_id=id,
+        user_id=user_id,
+        amount=values["amount"],
+        category=values["category"],
+        date=values["date"],
+        description=values["description"] or None,
+    )
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/delete")
