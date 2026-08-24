@@ -1,12 +1,16 @@
 import os
 import re
+from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import (
     create_user,
+    get_category_breakdown,
     get_db,
+    get_expense_summary,
+    get_recent_expenses,
     get_user_by_email,
     get_user_by_id,
     init_db,
@@ -80,7 +84,7 @@ def login():
         return render_template("login.html", error="Invalid email or password.")
 
     session["user_id"] = user["id"]
-    return redirect(url_for("landing"))
+    return redirect(url_for("profile"))
 
 
 @app.route("/logout")
@@ -110,7 +114,25 @@ def how_it_works():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    user = get_user_by_id(user_id)
+    total_spent, expense_count = get_expense_summary(user_id)
+    member_since = datetime.strptime(
+        user["created_at"], "%Y-%m-%d %H:%M:%S"
+    ).strftime("%B %Y")
+
+    return render_template(
+        "profile.html",
+        user=user,
+        member_since=member_since,
+        total_spent=total_spent,
+        expense_count=expense_count,
+        category_breakdown=get_category_breakdown(user_id),
+        recent_expenses=get_recent_expenses(user_id),
+    )
 
 
 @app.route("/expenses/add")

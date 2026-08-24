@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="profile-section">
+    <div class="profile-header">
+        <div class="profile-avatar">{{ user['name'][0]|upper }}</div>
+        <div class="profile-info">
+            <h1 class="profile-name">{{ user['name'] }}</h1>
+            <p class="profile-email">{{ user['email'] }}</p>
+            <span class="profile-badge">Member since {{ member_since }}</span>
+        </div>
+    </div>
+
+    <div class="profile-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 17l6-6 4 4 8-8"/>
+                    <path d="M15 7h6v6"/>
+                </svg>
+            </div>
+            <div class="stat-value">₹{{ "%.2f"|format(total_spent) }}</div>
+            <div class="stat-label">Total spent</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12a1 1 0 0 1 1 1v16l-3-2-3 2-3-2-3 2-3-2V4a1 1 0 0 1 1-1Z"/>
+                    <path d="M9 8h6"/>
+                    <path d="M9 12h6"/>
+                </svg>
+            </div>
+            <div class="stat-value">{{ expense_count }}</div>
+            <div class="stat-label">Expenses logged</div>
+        </div>
+    </div>
+
+    <div class="profile-panels">
+        <div class="panel-card">
+            <h2 class="panel-title">Spend by category</h2>
+            {% if category_breakdown %}
+            <div class="category-chart">
+                {% for row in category_breakdown %}
+                <div class="category-row">
+                    <span class="category-name">
+                        <span class="category-dot" style="background: var(--cat-{{ row['category']|lower }})"></span>
+                        {{ row['category'] }}
+                    </span>
+                    <div class="category-bar-track" title="{{ row['category'] }}: ₹{{ '%.2f'|format(row['total']) }}">
+                        <div class="category-bar-fill" style="width: {{ (row['total'] / category_breakdown[0]['total'] * 100)|round(1) }}%; background: var(--cat-{{ row['category']|lower }})"></div>
+                    </div>
+                    <span class="category-amount">₹{{ "%.2f"|format(row['total']) }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="panel-empty">No expenses yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="panel-card">
+            <h2 class="panel-title">Recent expenses</h2>
+            {% if recent_expenses %}
+            <ul class="recent-list">
+                {% for expense in recent_expenses %}
+                <li class="recent-row">
+                    <div class="recent-main">
+                        <span class="recent-category-tag" style="background: var(--cat-{{ expense['category']|lower }}-light)">{{ expense['category'] }}</span>
+                        <span class="recent-description">{{ expense['description'] or expense['category'] }}</span>
+                    </div>
+                    <div class="recent-side">
+                        <span class="recent-date">{{ expense['date'] }}</span>
+                        <span class="recent-amount">₹{{ "%.2f"|format(expense['amount']) }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="panel-empty">No expenses yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
