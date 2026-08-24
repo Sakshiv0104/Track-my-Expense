@@ -19,6 +19,25 @@
     --border: #e4e1da;
     --border-soft: #eeebe4;
 
+    /* Expense category palette — validated categorical hues (fixed order,
+       CVD-safe adjacency), one slot per Spendly category. Do not reorder or
+       hand-pick replacements; re-validate with the dataviz skill's palette
+       checker before changing any value. */
+    --cat-food: #2a78d6;
+    --cat-food-light: #e1ecf9;
+    --cat-transport: #eb6834;
+    --cat-transport-light: #fceae3;
+    --cat-bills: #1baf7a;
+    --cat-bills-light: #dff4ec;
+    --cat-health: #eda100;
+    --cat-health-light: #fcf2db;
+    --cat-entertainment: #e87ba4;
+    --cat-entertainment-light: #fcedf2;
+    --cat-shopping: #008300;
+    --cat-shopping-light: #dbeedb;
+    --cat-other: #4a3aa7;
+    --cat-other-light: #e6e3f3;
+
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
