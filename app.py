@@ -112,6 +112,39 @@ def how_it_works():
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
 
+def parse_date_range(start_str, end_str):
+    """Validate a start/end date pair for the profile date filter.
+
+    Returns (start_date, end_date, error):
+      - (None, None, None)        -> no filter requested (both blank)
+      - (None, None, "message")   -> malformed/incomplete/inverted input;
+                                      caller should fall back to all-time data
+      - ("YYYY-MM-DD", "YYYY-MM-DD", None) -> valid, inclusive range
+    """
+    start_str = (start_str or "").strip()
+    end_str = (end_str or "").strip()
+
+    if not start_str and not end_str:
+        return None, None, None
+
+    if not start_str or not end_str:
+        return None, None, "Please provide both a start and end date to filter."
+
+    try:
+        start = datetime.strptime(start_str, "%Y-%m-%d")
+        end = datetime.strptime(end_str, "%Y-%m-%d")
+    except ValueError:
+        return None, None, "Enter valid dates in YYYY-MM-DD format."
+
+    if start > end:
+        return None, None, "Start date must be on or before end date."
+
+    # Return the normalized, zero-padded form (not the raw input) so the
+    # SQL BETWEEN clause — a plain TEXT/lexicographic comparison — always
+    # compares against a canonical YYYY-MM-DD string.
+    return start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"), None
+
+
 @app.route("/profile")
 def profile():
     user_id = session.get("user_id")
@@ -119,10 +152,24 @@ def profile():
         return redirect(url_for("login"))
 
     user = get_user_by_id(user_id)
-    total_spent, expense_count = get_expense_summary(user_id)
     member_since = datetime.strptime(
         user["created_at"], "%Y-%m-%d %H:%M:%S"
     ).strftime("%B %Y")
+
+    start_param = request.args.get("start_date", "")
+    end_param = request.args.get("end_date", "")
+    start_date, end_date, filter_error = parse_date_range(start_param, end_param)
+    filter_active = start_date is not None
+
+    # Pre-fill the form with the validated/normalized values when the filter
+    # is active; on invalid input, clear the fields instead of echoing back
+    # the raw (possibly malformed) text the user typed.
+    start_date_value = start_date or ""
+    end_date_value = end_date or ""
+
+    total_spent, expense_count = get_expense_summary(
+        user_id, start_date=start_date, end_date=end_date
+    )
 
     return render_template(
         "profile.html",
@@ -130,8 +177,16 @@ def profile():
         member_since=member_since,
         total_spent=total_spent,
         expense_count=expense_count,
-        category_breakdown=get_category_breakdown(user_id),
-        recent_expenses=get_recent_expenses(user_id),
+        category_breakdown=get_category_breakdown(
+            user_id, start_date=start_date, end_date=end_date
+        ),
+        recent_expenses=get_recent_expenses(
+            user_id, start_date=start_date, end_date=end_date
+        ),
+        filter_active=filter_active,
+        filter_error=filter_error,
+        start_date_value=start_date_value,
+        end_date_value=end_date_value,
     )
 
 

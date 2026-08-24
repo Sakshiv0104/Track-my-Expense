@@ -110,38 +110,52 @@ def create_user(name, email, password_hash):
         conn.close()
 
 
-def get_expense_summary(user_id):
+def _apply_date_range(query, params, start_date, end_date):
+    """Append a parameterized 'AND date BETWEEN ? AND ?' clause when both
+    start_date and end_date are given. Trusts already-validated
+    YYYY-MM-DD strings — callers own date parsing/validation.
+    """
+    if start_date and end_date:
+        query += " AND date BETWEEN ? AND ?"
+        params += [start_date, end_date]
+    return query, params
+
+
+def get_expense_summary(user_id, start_date=None, end_date=None):
     conn = get_db()
     try:
-        row = conn.execute(
+        query = (
             "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS count "
-            "FROM expenses WHERE user_id = ?",
-            (user_id,),
-        ).fetchone()
+            "FROM expenses WHERE user_id = ?"
+        )
+        params = [user_id]
+        query, params = _apply_date_range(query, params, start_date, end_date)
+        row = conn.execute(query, params).fetchone()
         return row["total"], row["count"]
     finally:
         conn.close()
 
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, start_date=None, end_date=None):
     conn = get_db()
     try:
-        return conn.execute(
-            "SELECT category, SUM(amount) AS total FROM expenses "
-            "WHERE user_id = ? GROUP BY category ORDER BY total DESC",
-            (user_id,),
-        ).fetchall()
+        query = "SELECT category, SUM(amount) AS total FROM expenses WHERE user_id = ?"
+        params = [user_id]
+        query, params = _apply_date_range(query, params, start_date, end_date)
+        query += " GROUP BY category ORDER BY total DESC"
+        return conn.execute(query, params).fetchall()
     finally:
         conn.close()
 
 
-def get_recent_expenses(user_id, limit=5):
+def get_recent_expenses(user_id, limit=5, start_date=None, end_date=None):
     conn = get_db()
     try:
-        return conn.execute(
-            "SELECT * FROM expenses WHERE user_id = ? "
-            "ORDER BY date DESC, id DESC LIMIT ?",
-            (user_id, limit),
-        ).fetchall()
+        query = "SELECT * FROM expenses WHERE user_id = ?"
+        params = [user_id]
+        query, params = _apply_date_range(query, params, start_date, end_date)
+        query += " ORDER BY date DESC, id DESC LIMIT ?"
+        params.append(limit)
+        return conn.execute(query, params).fetchall()
     finally:
         conn.close()
