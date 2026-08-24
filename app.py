@@ -22,8 +22,9 @@ from database.db import (
 )
 
 app = Flask(__name__)
-# dev-only: regenerates on restart, invalidating existing sessions
-app.secret_key = os.urandom(24)
+# falls back to a random key if SECRET_KEY isn't set (dev-only: regenerates on
+# restart, invalidating existing sessions)
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 ALLOWED_CATEGORIES = [
@@ -352,8 +353,9 @@ def delete_expense(id):
     return redirect(url_for("profile"))
 
 
+with app.app_context():
+    init_db()
+    seed_db()
+
 if __name__ == "__main__":
-    with app.app_context():
-        init_db()
-        seed_db()
     app.run(debug=True, port=5001)
