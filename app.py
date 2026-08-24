@@ -9,11 +9,11 @@ from database.db import (
     create_expense,
     create_user,
     delete_expense as delete_expense_db,
+    get_all_expenses,
     get_category_breakdown,
     get_db,
     get_expense_by_id,
     get_expense_summary,
-    get_recent_expenses,
     get_user_by_email,
     get_user_by_id,
     init_db,
@@ -190,7 +190,7 @@ def profile():
         category_breakdown=get_category_breakdown(
             user_id, start_date=start_date, end_date=end_date
         ),
-        recent_expenses=get_recent_expenses(
+        all_expenses=get_all_expenses(
             user_id, start_date=start_date, end_date=end_date
         ),
         filter_active=filter_active,

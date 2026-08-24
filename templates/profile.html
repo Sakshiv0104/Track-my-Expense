@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Profile — Spendly{% endblock %}
+{% block title %}Profile — Expense Tracker{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
@@ -16,36 +16,46 @@
             <p class="profile-email">{{ user['email'] }}</p>
             <span class="profile-badge">Member since {{ member_since }}</span>
         </div>
-        <a href="{{ url_for('add_expense') }}" class="btn-primary">+ Add expense</a>
     </div>
 
     {% set empty_message = "No expenses in this range." if filter_active else "No expenses yet." %}
 
-    <div class="profile-filter">
-        {% if filter_error %}
-        <div class="auth-error">{{ filter_error }}</div>
-        {% endif %}
-
-        <form method="GET" action="{{ url_for('profile') }}" class="date-filter-form">
-            <div class="form-group">
-                <label for="start_date">From</label>
-                <input type="date" id="start_date" name="start_date"
-                       class="form-input" value="{{ start_date_value }}">
-            </div>
-            <div class="form-group">
-                <label for="end_date">To</label>
-                <input type="date" id="end_date" name="end_date"
-                       class="form-input" value="{{ end_date_value }}">
-            </div>
-            <button type="submit" class="btn-primary">Apply</button>
-        </form>
-
-        {% if filter_active %}
-        <div class="filter-status">
-            <span>Showing: {{ start_date_value }} – {{ end_date_value }}</span>
-            <a href="{{ url_for('profile') }}" class="btn-ghost">Clear filter</a>
+    <div class="panel-card combined-panel">
+        <div class="combined-panel-col combined-panel-add">
+            <h2 class="panel-title">Add expense</h2>
+            <p class="combined-add-copy">Log a new expense to your account.</p>
+            <a href="{{ url_for('add_expense') }}" class="btn-primary combined-add-btn">+ Add expense</a>
         </div>
-        {% endif %}
+
+        <div class="combined-panel-divider"></div>
+
+        <div class="combined-panel-col">
+            <h2 class="panel-title">Filter by date</h2>
+            {% if filter_error %}
+            <div class="auth-error">{{ filter_error }}</div>
+            {% endif %}
+
+            <form method="GET" action="{{ url_for('profile') }}" class="date-filter-form">
+                <div class="form-group">
+                    <label for="start_date">From</label>
+                    <input type="date" id="start_date" name="start_date"
+                           class="form-input" value="{{ start_date_value }}">
+                </div>
+                <div class="form-group">
+                    <label for="end_date">To</label>
+                    <input type="date" id="end_date" name="end_date"
+                           class="form-input" value="{{ end_date_value }}">
+                </div>
+                <button type="submit" class="btn-primary">Apply</button>
+            </form>
+
+            {% if filter_active %}
+            <div class="filter-status">
+                <span>Showing: {{ start_date_value }} – {{ end_date_value }}</span>
+                <a href="{{ url_for('profile') }}" class="btn-ghost">Clear filter</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
     <div class="profile-stats">
@@ -56,8 +66,10 @@
                     <path d="M15 7h6v6"/>
                 </svg>
             </div>
-            <div class="stat-value">₹{{ "%.2f"|format(total_spent) }}</div>
-            <div class="stat-label">Total spent</div>
+            <div class="stat-info">
+                <div class="stat-value">A${{ "%.2f"|format(total_spent) }}</div>
+                <div class="stat-label">Total spent</div>
+            </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">
@@ -67,53 +79,58 @@
                     <path d="M9 12h6"/>
                 </svg>
             </div>
-            <div class="stat-value">{{ expense_count }}</div>
-            <div class="stat-label">Expenses logged</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ expense_count }}</div>
+                <div class="stat-label">Expenses logged</div>
+            </div>
         </div>
     </div>
 
     <div class="profile-panels">
-        <div class="panel-card">
+        <div class="panel-card chart-panel">
             <h2 class="panel-title">Spend by category</h2>
             {% if category_breakdown %}
-            <div class="category-chart">
-                {% for row in category_breakdown %}
-                <div class="category-row">
-                    <span class="category-name">
-                        <span class="category-dot" style="background: var(--cat-{{ row['category']|lower }})"></span>
-                        {{ row['category'] }}
-                    </span>
-                    <div class="category-bar-track" title="{{ row['category'] }}: ₹{{ '%.2f'|format(row['total']) }}">
-                        <div class="category-bar-fill" style="width: {{ (row['total'] / category_breakdown[0]['total'] * 100)|round(1) }}%; background: var(--cat-{{ row['category']|lower }})"></div>
-                    </div>
-                    <span class="category-amount">₹{{ "%.2f"|format(row['total']) }}</span>
-                </div>
-                {% endfor %}
+            {% set total_all = category_breakdown|sum(attribute='total') %}
+            {% set ns = namespace(cum=0) %}
+            <div class="pie-chart-wrap">
+                <div class="pie-chart" style="background: conic-gradient({% for row in category_breakdown %}var(--cat-{{ row['category']|lower }}) {{ (ns.cum / total_all * 360)|round(2) }}deg {{ ((ns.cum + row['total']) / total_all * 360)|round(2) }}deg{% if not loop.last %}, {% endif %}{% set ns.cum = ns.cum + row['total'] %}{% endfor %});"></div>
+                <div class="pie-chart-hole"></div>
             </div>
+            <ul class="pie-legend">
+                {% for row in category_breakdown %}
+                <li class="pie-legend-item">
+                    <span class="category-dot" style="background: var(--cat-{{ row['category']|lower }})"></span>
+                    <span class="pie-legend-name">{{ row['category'] }}</span>
+                    <span class="pie-legend-amount">A${{ "%.2f"|format(row['total']) }}</span>
+                </li>
+                {% endfor %}
+            </ul>
             {% else %}
             <p class="panel-empty">{{ empty_message }}</p>
             {% endif %}
         </div>
 
-        <div class="panel-card">
-            <h2 class="panel-title">Recent expenses</h2>
-            {% if recent_expenses %}
-            <ul class="recent-list">
-                {% for expense in recent_expenses %}
-                <li class="recent-row">
-                    <div class="recent-main">
-                        <span class="recent-category-tag" style="background: var(--cat-{{ expense['category']|lower }}-light)">{{ expense['category'] }}</span>
-                        <span class="recent-description">{{ expense['description'] or expense['category'] }}</span>
-                    </div>
-                    <div class="recent-side">
-                        <span class="recent-date">{{ expense['date'] }}</span>
-                        <span class="recent-amount">₹{{ "%.2f"|format(expense['amount']) }}</span>
-                        <a href="{{ url_for('edit_expense', id=expense['id']) }}" class="recent-edit-link">Edit</a>
-                        <a href="{{ url_for('delete_expense', id=expense['id']) }}" class="recent-edit-link recent-delete-link">Delete</a>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+        <div class="panel-card expenses-panel">
+            <h2 class="panel-title">All expenses</h2>
+            {% if all_expenses %}
+            <div class="expenses-scroll">
+                <ul class="recent-list">
+                    {% for expense in all_expenses %}
+                    <li class="recent-row">
+                        <div class="recent-main">
+                            <span class="recent-category-tag" style="background: var(--cat-{{ expense['category']|lower }}-light)">{{ expense['category'] }}</span>
+                            <span class="recent-description">{{ expense['description'] or expense['category'] }}</span>
+                        </div>
+                        <div class="recent-side">
+                            <span class="recent-date">{{ expense['date'] }}</span>
+                            <span class="recent-amount">A${{ "%.2f"|format(expense['amount']) }}</span>
+                            <a href="{{ url_for('edit_expense', id=expense['id']) }}" class="recent-edit-link">Edit</a>
+                            <a href="{{ url_for('delete_expense', id=expense['id']) }}" class="recent-edit-link recent-delete-link">Delete</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% else %}
             <p class="panel-empty">{{ empty_message }}</p>
             {% endif %}

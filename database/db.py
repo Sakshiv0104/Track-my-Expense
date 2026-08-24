@@ -148,14 +148,13 @@ def get_category_breakdown(user_id, start_date=None, end_date=None):
         conn.close()
 
 
-def get_recent_expenses(user_id, limit=5, start_date=None, end_date=None):
+def get_all_expenses(user_id, start_date=None, end_date=None):
     conn = get_db()
     try:
         query = "SELECT * FROM expenses WHERE user_id = ?"
         params = [user_id]
         query, params = _apply_date_range(query, params, start_date, end_date)
-        query += " ORDER BY date DESC, id DESC LIMIT ?"
-        params.append(limit)
+        query += " ORDER BY date DESC, id DESC"
         return conn.execute(query, params).fetchall()
     finally:
         conn.close()
