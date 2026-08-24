@@ -8,12 +8,6 @@ import app as app_module
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(db_module, "DB_PATH", str(tmp_path / "test.db"))
     db_module.init_db()
-    app_module.app.confi
-    
-    
-    
-    
-
-    g["TESTING"] = True
+    app_module.app.config["TESTING"] = True
     with app_module.app.test_client() as test_client:
         yield test_client

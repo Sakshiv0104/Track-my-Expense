@@ -6,6 +6,7 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import (
+    create_expense,
     create_user,
     get_category_breakdown,
     get_db,
@@ -22,6 +23,12 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+ALLOWED_CATEGORIES = [
+    "Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other",
+]
+# Reject nan/inf/scientific notation/signs before float() gets a chance to accept them.
+AMOUNT_RE = re.compile(r"^\d+(\.\d{1,2})?$")
+MAX_DESCRIPTION_LENGTH = 500
 
 
 @app.context_processor
@@ -190,9 +197,97 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
+def parse_expense_form(form):
+    """Validate the add-expense form fields.
+
+    Returns (values, error):
+      - values: dict with amount/category/date/description, all as strings
+        (amount holds the parsed float on success). Each field is validated
+        independently; a field that fails is cleared to "" while other
+        valid fields are preserved for re-display.
+      - error: None if every field is valid, else the first validation
+        message encountered, checked in order amount -> category -> date
+        -> description.
+    """
+    error = None
+
+    amount_raw = (form.get("amount") or "").strip()
+    if AMOUNT_RE.match(amount_raw) and float(amount_raw) > 0:
+        amount = float(amount_raw)
+    else:
+        amount = ""
+        error = error or "Enter a valid positive amount."
+
+    category_raw = (form.get("category") or "").strip()
+    if category_raw in ALLOWED_CATEGORIES:
+        category = category_raw
+    else:
+        category = ""
+        error = error or "Select a valid category."
+
+    date_raw = (form.get("date") or "").strip()
+    if not date_raw:
+        date = ""
+        error = error or "Date is required."
+    else:
+        try:
+            parsed_date = datetime.strptime(date_raw, "%Y-%m-%d")
+        except ValueError:
+            date = ""
+            error = error or "Enter a valid date in YYYY-MM-DD format."
+        else:
+            if parsed_date.date() > datetime.now().date():
+                date = ""
+                error = error or "Date cannot be in the future."
+            else:
+                date = parsed_date.strftime("%Y-%m-%d")
+
+    description_raw = (form.get("description") or "").strip()
+    if len(description_raw) > MAX_DESCRIPTION_LENGTH:
+        description = ""
+        error = error or "Description must be 500 characters or fewer."
+    else:
+        description = description_raw
+
+    values = {
+        "amount": amount,
+        "category": category,
+        "date": date,
+        "description": description,
+    }
+    return values, error
+
+
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template(
+            "add_expense.html",
+            categories=ALLOWED_CATEGORIES,
+            amount="",
+            category="",
+            date=datetime.now().strftime("%Y-%m-%d"),
+            description="",
+        )
+
+    values, error = parse_expense_form(request.form)
+    if error:
+        return render_template(
+            "add_expense.html", categories=ALLOWED_CATEGORIES, error=error, **values
+        )
+
+    create_expense(
+        user_id=user_id,
+        amount=values["amount"],
+        category=values["category"],
+        date=values["date"],
+        description=values["description"] or None,
+    )
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/edit")
