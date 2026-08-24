@@ -55,6 +55,35 @@
     border-radius: 999px;
 }
 
+/* ------------------------------------------------------------------ */
+/* Date range filter                                                   */
+/* ------------------------------------------------------------------ */
+
+.profile-filter {
+    margin-bottom: 2rem;
+}
+
+.date-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.date-filter-form .form-group {
+    margin-bottom: 0;
+    min-width: 160px;
+}
+
+.filter-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}
+
 .profile-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -272,6 +301,8 @@
     }
 
     .profile-stats { grid-template-columns: 1fr; }
+
+    .date-filter-form { flex-direction: column; align-items: stretch; }
 
     .category-row {
         grid-template-columns: minmax(0, 90px) 1fr 65px;
